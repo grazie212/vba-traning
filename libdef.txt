@@ -3,4 +3,5 @@
 
 'modules
 ./basrc/modSample.bas
-
+./basrc/sort.bas
+./basrc/csvRead.bas

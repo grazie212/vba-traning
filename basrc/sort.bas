@@ -1,7 +1,8 @@
-Attribute VB_Name = "modSample"
+Attribute VB_Name = "sort"
 
 Option Explicit
 sub bubbleSort()
+' Às—pƒeƒXƒgƒR[ƒh
     dim num() as variant
     dim i as integer
     num = array(1,4,3,5,6,7,8,2,9)
@@ -12,7 +13,7 @@ sub bubbleSort()
 
 end sub
 
-' ãƒãƒ–ãƒ«ã‚½ãƒ¼ãƒˆã‚’å‚ç…§æ¸¡ã—ã§å®Ÿè¡Œ
+' ƒoƒuƒ‹ƒ\[ƒg‚ğQÆ“n‚µ‚ÅÀs
 function bubbleSortFunc(byref numArr() as variant)
     dim tmp as variant
     dim i as integer

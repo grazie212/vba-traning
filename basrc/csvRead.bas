@@ -9,12 +9,15 @@ sub csvFileRead()
     dim bookPath as string
     dim workPath as string
     dim fileName as string
+    dim fileName2 as string
     
     bookPath = ThisWorkbook.Path
     workPath = "\work\"
     fileName = bookPath & workpath & "test.csv"
+    fileName2 = bookPath & workpath & "testLf.csv"
 
-    call csvFileReadFunc(fileName)
+    ' call csvFileReadFunc(fileName)
+    ' call csvFileReadLfFunc(fileName2)
     MsgBox "csvFileRead END"
 end sub
 
@@ -24,7 +27,7 @@ function csvFileReadFunc(ByRef filename as string)
     dim splt as variant
     dim i as integer
     dim j as integer
-    
+
     ' (1)テキストファイルを開く(Openステートメント)
     open filename for input as #1
     j = 1
@@ -49,5 +52,22 @@ end function
 
 ' LFの読み込み
 function csvFileReadLfFunc(ByRef filename as string)
+    dim buf as variant
+    dim splt as variant
+    dim splt2 as variant
+    dim i as integer
+    dim j as integer
 
+    ' ファイルの読み込み
+    open filename for input as #1
+        line input #1,buf
+    Close #1
+
+    splt = split(buf,vblf)
+    for i = 0 to UBOUND(splt)
+        splt2 = split(splt(i),",")
+        for j = 0 to UBOUND(splt2)
+            sheets(sheetName).cells(i + 1,j + 1).value = splt2(j)
+        next j
+    next i 
 end function

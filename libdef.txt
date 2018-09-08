@@ -1,0 +1,6 @@
+'main
+./basrc/main.bas
+
+'modules
+./basrc/modSample.bas
+

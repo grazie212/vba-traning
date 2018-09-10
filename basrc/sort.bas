@@ -2,7 +2,7 @@ Attribute VB_Name = "sort"
 
 Option Explicit
 sub bubbleSort()
-' 実行用テストコード
+' ???s?p?e?X?g?R?[?h
     dim num() as variant
     dim i as integer
     num = array(1,4,3,5,6,7,8,2,9)
@@ -13,7 +13,7 @@ sub bubbleSort()
 
 end sub
 
-' バブルソートを参照渡しで実行
+' ?o?u???\?[?g??Q??n??????s
 function bubbleSortFunc(byref numArr() as variant)
     dim tmp as variant
     dim i as integer

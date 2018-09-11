@@ -1,23 +1,24 @@
 Attribute VB_Name = "IE_access"
-
 Option Explicit
-sub IE_access()
-    ' インターネットに接続してブラウザを開く
+Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" _
+   (ByVal pCaller As Long, _
+    ByVal szURL As String, _
+    ByVal szFileName As String, _
+    ByVal dwReserved As Long, _
+    ByVal lpfnCB As Long _
+    ) As Long
+
+Function IE_access(ByRef siteUrl As String,ByRef moji as string)
+    ' ?C???^?[?l?b?g????????u???E?U??J??
     dim objIE as InternetExplorer
     set objIE = CreateObject("InternetExplorer.Application")
-    '可視化
+
     objIE.Visible = True
 
-    ' 指定のページを開く
-    dim siteUrl As String
-    siteUrl = "http://auctions.yahoo.co.jp/"
     objIE.Navigate siteUrl
     call IEwait(objIE)
     call waitfor(3)
 
-    ' IEに自動文字入力
-    dim moji as String
-    moji = "colnago"
     dim objtag,objsubmit as object
 
     For Each objtag In objIE.Document.getElementsByTagName("input")
@@ -28,17 +29,17 @@ sub IE_access()
     Next
 
     For Each objsubmit In objIE.Document.getElementsByTagName("input")
-      If InStr(objsubmit.outerHTML, """検 索""") > 0 Then
+      If InStr(objsubmit.outerHTML, """?? ??""") > 0 Then
             objsubmit.Click
             Call WaitFor(3)
             Exit For
       End If
     Next
 
-    ' ボタンクリックで画面遷移
+    ' ?{?^???N???b?N????J??
     Dim objtsugi As Object
     For Each objtsugi In objIE.Document.getElementsByTagName("a")
-        If InStr(objtsugi.outerHTML, "次のページ") > 0 Then
+        If InStr(objtsugi.outerHTML, "????y?[?W") > 0 Then
             objtsugi.Click
             Call WaitFor(3)
             Exit For
@@ -67,29 +68,51 @@ Function WaitFor(ByVal second As Integer)
     Wend
 End Function
 
+sub main()
+    Dim strURL As String
+    Dim strPath As String
+     
+    strPath = "save path and savefilename"
+    strURL = "https://www.google.co.jp/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+    call fileDownload(strPath,strURL)
+    MsgBox "main end"
+end sub
 
-Sub testIE()
+
+
+
+Function fileDownload(ByRef savePath as string,ByRef dlUrl as string)
+    dim checkNum as Integer
+    checkNum = URLDownloadToFile(0, dlUrl, savePath, 0, 0)
+    If checkNum = 0 Then
+        MsgBox "complate！"
+    Else
+        MsgBox "NG"
+    End If
+end Function
+
+
+Function getUrl(ByRef url as string)
     dim sheetName as string
     sheetName = "work"
 
-    Dim objIE As InternetExplorer 'IEオブジェクトを準備
-    Set objIE = CreateObject("Internetexplorer.Application") '新しいIEオブジェクトを作成してセット
+    Dim objIE As InternetExplorer 
+    Set objIE = CreateObject("Internetexplorer.Application") 
     
-    ' objIE.Visible = True 'IEを表示
+    ' objIE.Visible = True 
     objIE.Visible = false
-    dim url as string
-    url = "https://tonari-it.com/vba-ie-links/"
-    objIE.navigate url 'IEでURLを開く
+     
+    objIE.navigate url 'IE??URL??J??
 
-    ' HTML読み込み時間確保
-    Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE '読み込み待ち
+    ' HTML?????????m??
+    Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE '????????
         DoEvents
     Loop
 
-    Dim htmlDoc As HTMLDocument 'HTMLドキュメントオブジェクトを準備
-    Set htmlDoc = objIE.document 'objIEで読み込まれているHTMLドキュメントをセット
+    Dim htmlDoc As HTMLDocument 'HTML?h?L???????g?I?u?W?F?N?g???
+    Set htmlDoc = objIE.document 'objIE????????????HTML?h?L???????g??Z?b?g
 
-    sheets(sheetName).cells(1,1).value = htmlDoc.Title 'HTMLドキュメントのタイトルを表示
+    sheets(sheetName).cells(1,1).value = htmlDoc.Title 'HTML?h?L???????g??^?C?g????\??
     dim elinks as IHTMLElement 
     dim cnt as Integer
     cnt = 2
@@ -98,4 +121,5 @@ Sub testIE()
         cnt = cnt + 1
     Next elinks
  
-End Sub
+End Function
+

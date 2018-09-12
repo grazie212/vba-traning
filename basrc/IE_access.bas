@@ -85,7 +85,7 @@ Function fileDownload(ByRef savePath as string,ByRef dlUrl as string)
     dim checkNum as Integer
     checkNum = URLDownloadToFile(0, dlUrl, savePath, 0, 0)
     If checkNum = 0 Then
-        MsgBox "complateI"
+        MsgBox "complate?I"
     Else
         MsgBox "NG"
     End If
@@ -123,3 +123,42 @@ Function getUrl(ByRef url as string)
  
 End Function
 
+sub yahoo()
+    dim siteUrl as string
+    dim search as string
+    siteUrl = "https://www.yahoo.co.jp/"
+    search = "hogehoge"
+    call yahoo_search(siteUrl,search)
+end sub
+
+Function yahoo_search(ByRef siteUrl As String,ByRef search as string)
+    dim objIE as InternetExplorer
+    set objIE = CreateObject("InternetExplorer.Application")
+
+    objIE.Visible = True
+
+    objIE.Navigate siteUrl
+    call IEwait(objIE)
+    call waitfor(3)
+    
+    dim objtag,objsubmit as object
+    For Each objtag In objIE.Document.getElementsByTagName("input")
+      If InStr(objtag.outerHTML, """srchtxt""") > 0 Then
+            objtag.Value = search
+            Exit For
+      End If
+    Next
+
+    For Each objsubmit In objIE.Document.getElementsByTagName("input")
+      If InStr(objsubmit.outerHTML, """srchbtn""") > 0 Then
+            objsubmit.Click
+            Call WaitFor(3)
+            Exit For
+      End If
+    Next    
+
+    ' close
+    objIE.quit
+    Set objIE = Nothing
+
+end Function

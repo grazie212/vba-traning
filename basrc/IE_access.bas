@@ -7,6 +7,42 @@ Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownlo
     ByVal dwReserved As Long, _
     ByVal lpfnCB As Long _
     ) As Long
+ public const sheetName as string = "work"
+
+sub fileDownloadGooglePic()
+    Dim strURL As String
+    Dim strPath As String
+     
+    strPath = "save path and savefilename"
+    strURL = "https://www.google.co.jp/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+    call fileDownload(strPath,strURL)
+    MsgBox "main end"
+end sub
+
+sub yahoo()
+    Dim objIE As Object
+    Set objIE = CreateObject("InternetExplorer.Application")
+    objIE.Visible = True
+
+    dim siteUrl as string
+    dim search as string
+
+    siteUrl = "https://www.yahoo.co.jp/"
+    ' search = "colnago"
+    ' call yahoo_search(objIE,siteUrl,search)
+    objIE.Navigate siteUrl
+
+    Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE 
+        DoEvents
+    Loop
+
+    siteUrl= objIE.LocationURL 
+    call getLink(objIE,siteUrl)
+
+    objIE.quit
+    Set objIE = Nothing
+    
+end sub
 
 Function IE_access(ByRef siteUrl As String,ByRef moji as string)
     ' ?C???^?[?l?b?g????????u???E?U??J??
@@ -36,7 +72,6 @@ Function IE_access(ByRef siteUrl As String,ByRef moji as string)
       End If
     Next
 
-    ' ?{?^???N???b?N????J??
     Dim objtsugi As Object
     For Each objtsugi In objIE.Document.getElementsByTagName("a")
         If InStr(objtsugi.outerHTML, "????y?[?W") > 0 Then
@@ -46,11 +81,7 @@ Function IE_access(ByRef siteUrl As String,ByRef moji as string)
         End If
     Next
 
-    ' close
-    objIE.quit
-    Set objIE = Nothing
-
-End Sub
+End Function
 
 Function IEWait(ByRef objIE As Object)
     Do While objIE.Busy = True Or objIE.ReadyState <> 4
@@ -68,19 +99,6 @@ Function WaitFor(ByVal second As Integer)
     Wend
 End Function
 
-sub main()
-    Dim strURL As String
-    Dim strPath As String
-     
-    strPath = "save path and savefilename"
-    strURL = "https://www.google.co.jp/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
-    call fileDownload(strPath,strURL)
-    MsgBox "main end"
-end sub
-
-
-
-
 Function fileDownload(ByRef savePath as string,ByRef dlUrl as string)
     dim checkNum as Integer
     checkNum = URLDownloadToFile(0, dlUrl, savePath, 0, 0)
@@ -92,50 +110,30 @@ Function fileDownload(ByRef savePath as string,ByRef dlUrl as string)
 end Function
 
 
-Function getUrl(ByRef url as string)
-    dim sheetName as string
-    sheetName = "work"
+Function getLink(ByRef objIE As InternetExplorer,ByRef siteUrl as string)
 
-    Dim objIE As InternetExplorer 
-    Set objIE = CreateObject("Internetexplorer.Application") 
+    objIE.Navigate siteUrl
     
-    ' objIE.Visible = True 
-    objIE.Visible = false
-     
-    objIE.navigate url 'IE??URL??J??
-
-    ' HTML?????????m??
-    Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE '????????
+    Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE 
         DoEvents
     Loop
 
-    Dim htmlDoc As HTMLDocument 'HTML?h?L???????g?I?u?W?F?N?g???
-    Set htmlDoc = objIE.document 'objIE????????????HTML?h?L???????g??Z?b?g
+    Dim htmlDoc As HTMLDocument 
+    Set htmlDoc = objIE.document 
 
-    sheets(sheetName).cells(1,1).value = htmlDoc.Title 'HTML?h?L???????g??^?C?g????\??
-    dim elinks as IHTMLElement 
+    sheets(sheetName).cells(1,1).value = htmlDoc.Title 
+    dim elinks as IHTMLElement
     dim cnt as Integer
     cnt = 2
     For Each elinks In htmlDoc.Links
-        sheets(sheetName).cells(cnt,2).value = elinks.href
+        objIE.navigate elinks.href
+        WaitFor(5)
         cnt = cnt + 1
     Next elinks
  
 End Function
 
-sub yahoo()
-    dim siteUrl as string
-    dim search as string
-    siteUrl = "https://www.yahoo.co.jp/"
-    search = "hogehoge"
-    call yahoo_search(siteUrl,search)
-end sub
-
-Function yahoo_search(ByRef siteUrl As String,ByRef search as string)
-    dim objIE as InternetExplorer
-    set objIE = CreateObject("InternetExplorer.Application")
-
-    objIE.Visible = True
+Function yahoo_search(ByRef objIE as Object,ByRef siteUrl As String,ByRef search as string)
 
     objIE.Navigate siteUrl
     call IEwait(objIE)
@@ -157,8 +155,20 @@ Function yahoo_search(ByRef siteUrl As String,ByRef search as string)
       End If
     Next    
 
-    ' close
-    objIE.quit
-    Set objIE = Nothing
+    ' ' close
+    ' objIE.quit
+    ' Set objIE = Nothing
 
 end Function
+
+
+Function IELinkClick(ByRef objIE As Object, ByVal anchorText As String)
+    Dim objLink As Object
+ 
+    For Each objLink In objIE.Document.getElementsByTagName("A")
+        If objLink.innerText = anchorText Then
+            objIE.navigate objLink.href
+            Exit For
+        End If
+    Next
+End Function

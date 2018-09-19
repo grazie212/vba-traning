@@ -28,17 +28,25 @@ sub yahoo()
     dim search as string
 
     siteUrl = "https://www.yahoo.co.jp/"
-    ' search = "colnago"
-    ' call yahoo_search(objIE,siteUrl,search)
+
     objIE.Navigate siteUrl
 
     Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE 
         DoEvents
     Loop
+    
+    Dim htmlDoc As HTMLDocument
+    Dim objLink As IHTMLelement
+    
+    Set htmlDoc = objIE.document
 
-    siteUrl= objIE.LocationURL 
-    call getLink(objIE,siteUrl)
-
+    For Each objLink In htmlDoc.Links
+        siteUrl = objLink.href
+        objIE.navigate siteUrl
+        Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE 
+            DoEvents
+        Loop
+    Next objLink
     objIE.quit
     Set objIE = Nothing
     
@@ -170,5 +178,16 @@ Function IELinkClick(ByRef objIE As Object, ByVal anchorText As String)
             objIE.navigate objLink.href
             Exit For
         End If
+    Next
+End Function
+
+Function IELinkClickAll(ByRef objIE As Object)
+    Dim objLink As Object
+ 
+    For Each objLink In objIE.Document.getElementsByTagName("A")
+        objIE.navigate objLink.href
+        Do While objIE.Busy = True Or objIE.readyState < READYSTATE_COMPLETE 
+            DoEvents
+        Loop
     Next
 End Function

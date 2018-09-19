@@ -1,8 +1,7 @@
 'main
-./basrc/main.bas
 
 'modules
-'./basrc/modSample.bas
-'./basrc/sort.bas
-'./basrc/csvRead.bas
-./basrc/IE_access.bas
+./basrc/IE/01_description.bas
+./basrc/IE/02_innerText.bas
+./basrc/IE/03_getLinkAll.bas
+./basrc/IE/04_getTableData.bas
